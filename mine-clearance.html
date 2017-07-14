@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="tools.js"></script>
+    <style>
+        * {
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+        }
+        .wrapper {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 600px;
+            height: 600px;
+            border: 1px solid black;
+            transform: translate(-50%,-50%);
+        }
+
+        p {
+            padding-bottom: 20px;
+        }
+
+        ul {
+            width: 600px;
+            height: 20px;
+            float: left;
+        }
+
+        li {
+            float: left;
+            width: 18px;
+            height: 18px;
+            border: 1px solid black;
+            background: #999;
+            line-height: 18px;
+            text-align: center;
+        }
+
+        .flag {
+            background-image: url('flag.png');
+            background-size: 18px 18px;
+        }
+
+        .checked {
+            background-color: #eee;
+        }
+
+        .dead {
+            background-image: url('mine.jpg');
+            background-size: 18px 18px;
+        }
+    </style>
+</head>
+<body>
+    <p>剩余雷数：
+        <span></span>
+    </p>
+    <div class="wrapper"></div>
+    
+
+
+
+    <script>
+        var mapArray = [];
+        var mineArray = [];
+        var $Wrapper = document.getElementsByClassName('wrapper')[0];
+        var $Span = document.getElementsByTagName('span')[0];
+        var num = 20;
+        var Num = num;
+        var sizeX = 30;
+        var sizeY = 30;
+
+        function Init(el,arr,count,state) {
+            this.count = count || 0;
+            this.state = state || 0;
+            this.el = el;
+            this.arr = arr || [];
+        }
+
+        //布局
+        function createView(sizeX,sizeY) {
+            for(var i = 0;i < sizeY;i ++) {
+                var $Ul = document.createElement('ul');
+                mapArray[i] = new Array(sizeX);
+                for(var j = 0;j < sizeX;j ++) {
+                    var $Li = document.createElement('li');
+                    $Li.setAttribute('id',i + '-' + j);
+                    $Ul.appendChild($Li);
+                    mapArray[i][j] = new Init($Li,roundArr(i,j));
+                }
+                $Wrapper.appendChild($Ul);
+            }
+            setMine(num,sizeX,sizeY);
+            $Span.innerHTML = num;
+            mapArray.forEach(function (item1,index) {
+                item1.forEach(function(item2,index) {
+                    item2.arr.forEach(function(item3){
+                        if(mapArray[item3.x][item3.y].state == 1){
+                            item2.count++;
+                        }
+                    })
+                })
+            })
+            console.log(mapArray);
+        }
+
+        //设置地雷
+        function setMine(num,sizeX,sizeY) {
+            var posX,
+                posY;
+            for(var i = 0;i < num; i ++) {
+                do{
+                    posX = Math.ceil(Math.random()*(sizeX - 1));
+                    posY = Math.ceil(Math.random()*(sizeY - 1));
+                }
+                while(mapArray[posX][posY].state === 1);
+                mapArray[posX][posY].state = 1;
+                mineArray.push(mapArray[posX][posY].el);
+            }
+        }
+
+        //绑定鼠标事件
+        function bindEvent() {
+            document.oncontextmenu = function(e) {
+                e.preventDefault();
+            }
+            $Wrapper.onmousedown = function(e) {
+                switch(e.button) {
+                    case 0: 
+                        if(e.target.className !== 'flag'){
+                            judge(e.target.id);
+                        }
+                        break;
+                    case 2:
+                        var arr = e.target.id.split('-');
+                        var i = parseInt(arr[0]);
+                        var j = parseInt(arr[1]);
+                        if(mapArray[i][j].state !== 3) {
+                            e.target.setAttribute('class',e.target.className === 'flag' ? '' : 'flag');
+                            if(e.target.className == 'flag'){
+                                num --;
+                                if(mapArray[i][j].state === 1){
+                                    Num --;
+                                    console.log(Num);
+                                }
+                            }else{
+                                num ++;
+                                if(mapArray[i][j].state === 1){
+                                    Num ++;
+                                    console.log(Num);
+                                }
+                            }
+                            $Span.innerHTML = num;
+                            if(Num === 0){
+                                over(true);
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+        createView(sizeX,sizeY);
+        bindEvent();
+        
+
+        //周围数组，雷数
+        function roundArr(i,j) {
+            var arr = [];
+            if(i - 1 >= 0){
+                arr.push({x:i-1,y:j});
+                if(j - 1 >= 0){
+                    arr.push({x:i-1,y:j-1})
+                }
+            }
+            if(i + 1 <= sizeX - 1){
+                arr.push({x:i+1,y:j})
+                if(j + 1 < sizeY - 1){
+                    arr.push({x:i+1,y:j+1})
+                }
+            }
+            if(j - 1 >= 0){
+                arr.push({x:i,y:j-1})
+                if(i + 1 <= sizeX - 1){
+                    arr.push({x:i+1,y:j-1})
+                }
+            }
+            if(j + 1 <= sizeY - 1){
+                arr.push({x:i,y:j+1})
+                if(i - 1 >= 0){
+                    arr.push({x:i-1,y:j+1})
+                }
+            }
+            // arr.forEach(function(item){
+            //     if(mapArray[item.x][item.y].state == 1){
+            //         mapArray[i][j].count++;
+            //     }
+            // })
+            return arr;
+        }
+
+        //判断函数
+        function judge(id) {
+            var arr = id.split('-');
+            var i = parseInt(arr[0]);
+            var j = parseInt(arr[1]);
+            if(mapArray[i][j].state === 1) {
+                mapArray[i][j].state = 3;
+                console.log('dead');
+                over(false);
+            } else if(mapArray[i][j].state == 0) {
+                mapArray[i][j].state = 3;
+                mapArray[i][j].el.className = 'checked';
+                if(mapArray[i][j].count === 0){
+                    mapArray[i][j].arr.forEach(function(item) {
+                        if(mapArray[item.x][item.y].state != 3 && mapArray[item.x][item.y].el.className !== 'flag') {
+                            judge(mapArray[item.x][item.y].el.id);
+                        }
+                    })
+                }else {
+                    mapArray[i][j].el.innerHTML = mapArray[i][j].count + '';
+                }
+            }
+        }
+
+        //结束游戏
+        function over(flag) {
+            mineArray.forEach(function(item,index) {
+                item.className = 'dead';
+            })
+            
+            setTimeout(function() {
+                if(flag){
+                    alert('你赢了');
+                }else{
+                    alert('游戏结束');
+                }
+            },100);
+        }
+
+        
+    </script>
+</body>
+</html>
