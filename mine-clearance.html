@@ -62,7 +62,6 @@
         <span></span>
     </p>
     <div class="wrapper"></div>
-    
 
 
 
@@ -75,7 +74,8 @@
         var Num = num;
         var sizeX = 30;
         var sizeY = 30;
-
+        var holdOn = [];
+        //state  0:没有累  1：有雷  3：被检查
         function Init(el,arr,count,state) {
             this.count = count || 0;
             this.state = state || 0;
@@ -98,6 +98,7 @@
             }
             setMine(num,sizeX,sizeY);
             $Span.innerHTML = num;
+            //计算周围雷数
             mapArray.forEach(function (item1,index) {
                 item1.forEach(function(item2,index) {
                     item2.arr.forEach(function(item3){
@@ -227,6 +228,7 @@
                 }
             }
         }
+
 
         //结束游戏
         function over(flag) {
