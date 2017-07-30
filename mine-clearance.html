@@ -70,7 +70,7 @@
         var mineArray = [];
         var $Wrapper = document.getElementsByClassName('wrapper')[0];
         var $Span = document.getElementsByTagName('span')[0];
-        var num = 100;
+        var num = 10;
         var Num = num;
         var sizeX = 30;
         var sizeY = 30;
@@ -226,6 +226,7 @@
                 // }else {
                 //     mapArray[i][j].el.innerHTML = mapArray[i][j].count + '';
                 // }
+                //非递归
                 holdOn.push({x:i,y:j})
                 while(holdOn.length) {
                     mapArray[holdOn[0].x][holdOn[0].y].state = 3;
