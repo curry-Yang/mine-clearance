@@ -62,7 +62,6 @@
         <span></span>
     </p>
     <div class="wrapper"></div>
-    <div></div>
 
 
 
@@ -71,7 +70,7 @@
         var mineArray = [];
         var $Wrapper = document.getElementsByClassName('wrapper')[0];
         var $Span = document.getElementsByTagName('span')[0];
-        var num = 20;
+        var num = 100;
         var Num = num;
         var sizeX = 30;
         var sizeY = 30;
@@ -216,16 +215,35 @@
                 console.log('dead');
                 over(false);
             } else if(mapArray[i][j].state == 0) {
-                mapArray[i][j].state = 3;
-                mapArray[i][j].el.className = 'checked';
-                if(mapArray[i][j].count === 0){
-                    mapArray[i][j].arr.forEach(function(item) {
-                        if(mapArray[item.x][item.y].state != 3 && mapArray[item.x][item.y].el.className !== 'flag') {
-                            judge(mapArray[item.x][item.y].el.id);
+                // mapArray[i][j].state = 3;
+                // mapArray[i][j].el.className = 'checked';
+                // if(mapArray[i][j].count === 0){
+                //     mapArray[i][j].arr.forEach(function(item) {
+                //         if(mapArray[item.x][item.y].state != 3 && mapArray[item.x][item.y].el.className !== 'flag') {
+                //             judge(mapArray[item.x][item.y].el.id);
+                //         }
+                //     })
+                // }else {
+                //     mapArray[i][j].el.innerHTML = mapArray[i][j].count + '';
+                // }
+                holdOn.push({x:i,y:j})
+                while(holdOn.length) {
+                    mapArray[holdOn[0].x][holdOn[0].y].state = 3;
+                    mapArray[holdOn[0].x][holdOn[0].y].el.className = "checked";
+                    if(mapArray[holdOn[0].x][holdOn[0].y].count === 0) {
+                        var arr = mapArray[holdOn[0].x][holdOn[0].y].arr;
+                        var len = arr.length;
+                        for(var k = 0;k < len;k ++) {
+                            if(mapArray[arr[k].x][arr[k].y].state != 3 && mapArray[arr[k].x][arr[k].y].el.className != 'flag') {
+                                mapArray[arr[k].x][arr[k].y].state =3;
+                                mapArray[arr[k].x][arr[k].y].el.className = "checked";
+                                holdOn.push(arr[k]);
+                            }
                         }
-                    })
-                }else {
-                    mapArray[i][j].el.innerHTML = mapArray[i][j].count + '';
+                    }else {
+                        mapArray[holdOn[0].x][holdOn[0].y].el.innerHTML = mapArray[holdOn[0].x][holdOn[0].y].count + '';
+                    }
+                    holdOn.shift();
                 }
             }
         }
